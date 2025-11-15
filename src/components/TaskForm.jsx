@@ -1,33 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addTask } from "../features/tasks/taskSlice";
+import { addTask, editTask } from "../features/tasks/taskSlice";
 import { v4 as uuid } from "uuid";
 import { useNavigate, useParams } from "react-router-dom";
 
 const TaskForm = () => {
-  //Agregamos un useState para guardar los cambios del formulario
   const [task, setTask] = useState({
     title: "",
     description: "",
   });
 
-  //agregamos el acceso a dispatch de redux
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
-
-  //Agregamos un hook useParams para acceder a los parámetros de la url
   const params = useParams();
-  //Agregamos un hook useSelector para accecer al state
+
+  // CORREGIDO: tu store usa "tasks"
   const tasks = useSelector((state) => state.tasks);
 
-  //Agregando un useEffect para cargar los datos de la tarea a modificar
   useEffect(() => {
     if (params.id) {
-      //Pasamos la tarea encontrada al estado mediante setTask
-      setTask(tasks.find((task) => task.id === params.id));
+      const foundTask = tasks.find((t) => String(t.id) === String(params.id));
+      if (foundTask) {
+        setTask(foundTask);
+      }
     }
-  }, []);
+  }, [params.id, tasks]);
 
   const handleChange = (e) => {
     setTask({
@@ -35,14 +32,16 @@ const TaskForm = () => {
       [e.target.name]: e.target.value,
     });
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(
-      addTask({
-        ...task,
-        id: uuid(),
-      })
-    );
+
+    if (params.id) {
+      dispatch(editTask(task));
+    } else {
+      dispatch(addTask({ ...task, id: uuid(), completed: false }));
+    }
+
     navigate("/");
   };
 
@@ -55,12 +54,14 @@ const TaskForm = () => {
         value={task.title}
         onChange={handleChange}
       />
+
       <textarea
         name="description"
         placeholder="Description"
-        onChange={handleChange}
         value={task.description}
+        onChange={handleChange}
       ></textarea>
+
       <button>Save</button>
     </form>
   );
