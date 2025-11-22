@@ -14,15 +14,12 @@ const TaskForm = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  // CORREGIDO: tu store usa "tasks"
   const tasks = useSelector((state) => state.tasks);
 
   useEffect(() => {
     if (params.id) {
       const foundTask = tasks.find((t) => String(t.id) === String(params.id));
-      if (foundTask) {
-        setTask(foundTask);
-      }
+      if (foundTask) setTask(foundTask);
     }
   }, [params.id, tasks]);
 
@@ -46,24 +43,38 @@ const TaskForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="title"
-        placeholder="Title"
-        value={task.title}
-        onChange={handleChange}
-      />
+    <div className="max-w-xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        {params.id ? "Edit Task" : "Create Task"}
+      </h1>
 
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={task.description}
-        onChange={handleChange}
-      ></textarea>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {/* Title */}
+        <input
+          type="text"
+          name="title"
+          placeholder="Task Title"
+          value={task.title}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
 
-      <button>Save</button>
-    </form>
+        {/* Description */}
+        <textarea
+          name="description"
+          placeholder="Task Description"
+          rows="4"
+          value={task.description}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        ></textarea>
+
+        {/* Button */}
+        <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
+          Save
+        </button>
+      </form>
+    </div>
   );
 };
 
